@@ -1,8 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0
 
-WORKDIR /sandbox
+WORKDIR /code-sandbox
 
-COPY runner.sh .
-RUN chmod +x runner.sh
+COPY execute-code.sh .
+RUN chmod +x execute-code.sh
 
-ENTRYPOINT ["./runner.sh"]
+ENTRYPOINT ["./execute-code.sh"]

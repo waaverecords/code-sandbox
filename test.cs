@@ -1,14 +1,14 @@
 using System.Diagnostics;
 
-//var code = "var i=0; while(true) i++;";
-var code = "Console.WriteLine(\"Hello, World!\");";
+var code = "var i=0; while(true) i++;";
+//var code = "Console.WriteLine(\"Hello, World!\");";
 
 var containerName = $"code-sandbox-{Guid.NewGuid().ToString("N").Substring(0, 8)}";
 
 var runPsi = new ProcessStartInfo
 {
     FileName = "docker",
-    Arguments = $"run --rm -i --name {containerName} test",
+    Arguments = $"run --rm -i --name {containerName} code-sandbox",
     RedirectStandardInput = true,
     RedirectStandardOutput = true,
     RedirectStandardError = true,
