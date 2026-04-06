@@ -1,14 +1,19 @@
 using System.Diagnostics;
 
-var code = "var i=0; while(true) i++;";
-//var code = "Console.WriteLine(\"Hello, World!\");";
+var code = await File.ReadAllTextAsync("code.cs");
 
 var containerName = $"code-sandbox-{Guid.NewGuid().ToString("N").Substring(0, 8)}";
 
 var runPsi = new ProcessStartInfo
 {
     FileName = "docker",
-    Arguments = $"run --rm -i --name {containerName} code-sandbox",
+    Arguments = $"""
+        run --rm -i
+        --name {containerName}
+        --network host
+        code-sandbox
+        """
+        .Replace("\r\n", " "),
     RedirectStandardInput = true,
     RedirectStandardOutput = true,
     RedirectStandardError = true,
@@ -19,6 +24,9 @@ using var process = Process.Start(runPsi);
 
 await process.StandardInput.WriteAsync(code);
 process.StandardInput.Close();
+
+// TODO: get container ip
+// TODO: add to ip tables
 
 var exitTask = process.WaitForExitAsync();
 var timeoutTask = Task.Delay(TimeSpan.FromSeconds(10));
@@ -42,12 +50,15 @@ if (finishedTask == timeoutTask)
     };
     var stopProcess = Process.Start(stopPsi);
     await stopProcess.WaitForExitAsync();
-
-    return;
 }
 
-var stdOut = await stdOutTask;
-var stdErr = await stdErrTask;
+if (finishedTask == exitTask)
+{
+    var stdOut = await stdOutTask;
+    var stdErr = await stdErrTask;
 
-Console.WriteLine(stdOut);
-Console.WriteLine(stdErr);
+    Console.WriteLine(stdOut);
+    Console.WriteLine(stdErr);
+}
+
+// TODO: remove from ip tables
